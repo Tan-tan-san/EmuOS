@@ -1,11 +1,14 @@
+FROM alpine/git AS clone
+WORKDIR /src
+RUN git clone --depth 1 https://github.com/Emupedia/emupedia.github.io.git
+
 FROM nginx:alpine
-
-# Copy the whole beta directory into /usr/share/nginx/html
 WORKDIR /usr/share/nginx/html
-COPY Emupedia/beta/ .
 
-# Tell nginx to look inside /usr/share/nginx/html/emuos as its root
-# We'll override nginx config:
+# Copy only the whole beta folder from the clone step
+COPY --from=clone /src/emupedia.github.io/beta/ .
+
+# Use your custom nginx.conf to point root to /emuos inside beta
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
